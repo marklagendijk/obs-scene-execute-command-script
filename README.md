@@ -35,5 +35,5 @@ Most PTZ cameras come with a web-application. In this web-application you can co
 9. Find where it sets the preset. Replace the preset with `SCENE_VALUE`.
 10. Enter the preset value for every scene, and enable the checkboxes.
 11. Test it. When you have issues you can open the `Script Log`. The script will tell what commands it is executing.
-12 ...
-13 Profit!
+12. ...
+13. Profit!
