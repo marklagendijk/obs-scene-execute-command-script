@@ -1,73 +1,65 @@
--- 
+-- MIT License
 --
--- Geert M. Eikelboom, 2020
+-- Copyright (c) Geert Eikelboom, Mark Lagendijk
 --
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+--
+-- The above copyright notice and this permission notice shall be included in all
+-- copies or substantial portions of the Software.
+--
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- SOFTWARE.
+--
+-- Original script by Geert Eikelboom
+-- Generalized and released on GitHub (with permission of Geert) by Mark Lagendijk
 
 obs = obslua
-config = {}
-path = ""
-local_settings = nil
+settings = {}
 
-function on_event(event)
-	obs.script_log(obs.LOG_INFO, "info: Event " .. event);
+-- Script hook for defining the script description
+function script_description()
+	return [[
+Execute a CLI command whenever a scene is activated.
 
+When specifying the command 'SCENE_VALUE' can be used to denote the 'value' that was entered for the scene.
 
-	local scenes = obs.obs_frontend_get_scenes()
-	-- Clear configuration table
-	config = {}
-	
-	-- (Originally part of script_update) Add one configuration item per scene
-	if scenes ~= nil then
-		for _, scene in ipairs(scenes) do
-			local name = obs.obs_source_get_name(scene)
-			
-			local s = {}
-			s.name = "scene_" .. name
-			s.value = obs.obs_data_get_int(local_settings, s.name)
-			
-			table.insert(config, s)
-			
-			obs.script_log(obs.LOG_INFO, "info: Added scene '" .. s.name .. "' (preset " .. s.value .. ")")
-		end
-	end
-	obs.source_list_release(scenes)
+Example:
+When command is
+    curl -X POST http://192.168.1.123/load-preset -d "preset=SCENE_VALUE"
 
+And Scene 1 value is
+    overview
 
-	if event == obs.OBS_FRONTEND_EVENT_SCENE_CHANGED then
-		local scene = obs.obs_frontend_get_current_scene()
-		local scene_name = obs.obs_source_get_name(scene)
-		
-		if config ~= nil then
-			for _, conf in ipairs(config) do
-				if conf.name == "scene_" .. scene_name then
-					-- Send command to camera
-					obs.script_log(obs.LOG_INFO, "info: Detected switch to '" .. conf.name .. "' (preset " .. conf.value .. ")")
-					
-					obs.script_log(obs.LOG_INFO, path .. conf.value)
-					
-					result = os.execute(path .. conf.value)
-				end
-			end
-		end
+Activating Scene 1 would execute:
+    curl -X POST http://192.168.1.123/load-preset -d "preset=overview"
 
-		obs.obs_source_release(scene);
-	end
+See https://github.com/marklagendijk/obs-scene-execute-command-script/ for further documentation and examples.
+]]
 end
 
--- Defines the properties that the user
--- can change for the entire script module itself
+-- Script hook for defining the settings that can be configured for the script
 function script_properties()
 	local props = obs.obs_properties_create()
 
-	obs.obs_properties_add_text(props, "path", "Command", obs.OBS_TEXT_DEFAULT)
+	obs.obs_properties_add_text(props, "command", "Command", obs.OBS_TEXT_DEFAULT)
 	
 	local scenes = obs.obs_frontend_get_scenes()
 	
 	if scenes ~= nil then
 		for _, scene in ipairs(scenes) do
-			local name = obs.obs_source_get_name(scene)
-			
-			local p = obs.obs_properties_add_int(props, "scene_" .. name, name, 0, 139, 1) -- Presets range from 0x00 - 0X8B
+			local scene_name = obs.obs_source_get_name(scene)
+			obs.obs_properties_add_bool(props, "scene_enabled_" .. scene_name, "Execute when '" .. scene_name .. "' is activated")
+			obs.obs_properties_add_text(props, "scene_value_" .. scene_name, scene_name .. " value", obs.OBS_TEXT_DEFAULT)
 		end
 	end
 	
@@ -76,21 +68,33 @@ function script_properties()
 	return props
 end
 
--- The description shown to the user
-function script_description()
-	return "Configure camera zoom/focus preset numbers for each scene"
+-- Script hook that is called whenver the script settings change
+function script_update(_settings)	
+	settings = _settings
 end
 
--- Will be called when settings are changed
-function script_update(settings)
-	
-	path = obs.obs_data_get_string(settings, "path")
-	obs.script_log(obs.LOG_INFO, "info: Path set to '" .. path .. "'")
-	
-	-- Moved settings processing to on_event, because list of scenes is not available on loading the plugin
-	local_settings = settings
-end
-
+-- Script hook that is called when the script is loaded
 function script_load(settings)
-	obs.obs_frontend_add_event_callback(on_event)
+	obs.obs_frontend_add_event_callback(handle_event)
+end
+
+function handle_event(event)
+	if event == obs.OBS_FRONTEND_EVENT_SCENE_CHANGED then
+		handle_scene_change()	
+	end
+end
+
+function handle_scene_change()
+	local scene = obs.obs_frontend_get_current_scene()
+	local scene_name = obs.obs_source_get_name(scene)
+	local scene_enabled = obs.obs_data_get_bool(settings, "scene_enabled_" .. scene_name)
+	if scene_enabled then
+		local command = obs.obs_data_get_string(settings, "command")
+		local scene_value = obs.obs_data_get_string(settings, "scene_value_" .. scene_name)
+		local scene_command = string.gsub(command, "SCENE_VALUE", scene_value)
+		obs.script_log(obs.LOG_INFO, "Activating " .. scene_name .. ". Executing command:\n  " .. scene_command)
+	else
+		obs.script_log(obs.LOG_INFO, "Activating " .. scene_name .. ". Command execution is disabled for this scene.")
+	end
+	obs.obs_source_release(scene);
 end
