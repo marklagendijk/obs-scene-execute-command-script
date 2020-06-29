@@ -38,10 +38,10 @@ When command is
     curl -X POST http://192.168.1.123/load-preset -d "preset=SCENE_VALUE"
 
 And Scene 1 value is
-    overview
+    5
 
 Activating Scene 1 would execute:
-    curl -X POST http://192.168.1.123/load-preset -d "preset=overview"
+    curl -X POST http://192.168.1.123/load-preset -d "preset=5"
 
 See https://github.com/marklagendijk/obs-scene-execute-command-script/ for further documentation and examples.
 ]]
@@ -93,6 +93,7 @@ function handle_scene_change()
 		local scene_value = obs.obs_data_get_string(settings, "scene_value_" .. scene_name)
 		local scene_command = string.gsub(command, "SCENE_VALUE", scene_value)
 		obs.script_log(obs.LOG_INFO, "Activating " .. scene_name .. ". Executing command:\n  " .. scene_command)
+		os.execute(scene_command)
 	else
 		obs.script_log(obs.LOG_INFO, "Activating " .. scene_name .. ". Command execution is disabled for this scene.")
 	end
