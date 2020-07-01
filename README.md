@@ -1,4 +1,4 @@
-# obs-scene-execute-command-script
+# obs-scene-execute-command-script [![GitHub license](https://img.shields.io/github/license/marklagendijk/obs-scene-execute-command-script)](https://github.com/marklagendijk/obs-scene-execute-command-script/blob/master/LICENSE)
 OBS script for executing any CLI command whenever whenever a scene is activated. Useful for:
 - Loading a preset of any PTZ camera when an OBS scene is activated.
 - Executing any command that does anything when an OBS scene is activated.
