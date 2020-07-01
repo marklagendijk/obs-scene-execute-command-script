@@ -37,3 +37,16 @@ Most PTZ cameras come with a web-application. In this web-application you can co
 11. Test it. When you have issues you can open the `Script Log`. The script will tell what commands it is executing.
 12. ...
 13. Profit!
+
+### Loading PTZ presets with onvif-ptz-cli
+Many PTZ cameras have support for the ONVIF protocol. Since this is an old SOAP protocol you can't easily execute these commands with curl.
+
+[onvif-ptz-cli](https://github.com/marklagendijk/node-onvif-ptz-cli) is a CLI tool that I created to be able to easily execute ONVIF commands from the command line. Together with the OBS Scene Execute Command you can easily execute ONVIF commands when an OBS scene is activated.
+
+1. Install [onvif-ptz-cli](https://github.com/marklagendijk/node-onvif-ptz-cli).
+2. On the command line, move the camera to a diferent preset using `onvif-ptz`. Something like: `onvif-ptz goto-preset --baseUrl=http://192.168.0.123 -u=admin -p=admin --preset=1`.
+3. Copy the command and paste it in the `Command` setting of the script in OBS, and replace the preset with `SCENE_VALUE`. Something like: `onvif-ptz goto-preset --baseUrl=http://192.168.0.123 -u=admin -p=admin --preset=SCENE_VALUE`.
+4. Enter the preset value for every scene, and enable the checkboxes.
+5. Test it. When you have issues you can open the `Script Log`. The script will tell what commands it is executing.
+6. ...
+7. Profit!
