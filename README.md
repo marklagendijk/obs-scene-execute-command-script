@@ -68,3 +68,14 @@ Many PTZ cameras have support for the ONVIF protocol. Since this is an old SOAP 
 5. Test it. When you have issues you can open the `Script Log`. The script will tell what commands it is executing.
 6. ...
 7. Profit!
+
+
+## Contributors
+* Geert Eikelboom (my brother-in-law)
+  * Wrote the original script
+  * Told me about OBS Scripts
+  * Gave me the script to publish on GitHub
+* [Mark Lagendijk](https://github.com/marklagendijk)
+  * Generalized and improved the script
+  * Wrote documenation
+  * Published it [on GitHub](https://github.com/marklagendijk/obs-scene-execute-command-scrip) and [OBS Forums](https://obsproject.com/forum/resources/scene-execute-command.1028/)
