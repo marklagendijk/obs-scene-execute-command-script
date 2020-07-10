@@ -10,6 +10,7 @@ OBS script for executing any CLI command whenever whenever a scene is activated.
 4. Click `+` and select the `scene_execute_command.lua` file at the location where you extracted it.
 5. The script appears under `Loaded scripts`. Click it.
 6. You will see the script's description and settings.
+7. Whenever you add / rename a scene, you will have to press the `Reload Scripts` button, before the script settings will show the settings for this new scene.
 
 ## Usage
 1. Test the command you want to execute, by executing it on the command line.
@@ -19,7 +20,24 @@ OBS script for executing any CLI command whenever whenever a scene is activated.
 5. Enter the variable part for each scene.
 
 ## Examples
-### Loading PTZ presets with curl
+### Loading PTZ presets of a Lumens camera using curl
+* `Command`: `curl http://192.168.178.61/cgi-bin/lums_configuration.cgi -H "Cookie: userName=admin; passWord=admin;" --data-raw "{\"cmd\":\"campresetrecall\",\"memnum\":\"SCENE_VALUE\"}"`
+* `Scene1 value`: `1`
+* `Scene2 value`: `2`
+
+### Loading PTZ presets of a camera with ONVIF support using onvif-ptz-cli
+* `Command`: [onvif-ptz goto-preset --baseUrl=http://192.168.0.123 -u=admin -p=admin --preset=SCENE_VALUE`](https://github.com/marklagendijk/node-onvif-ptz-cli)
+* `Scene1 value`: `1`
+* `Scene2 value`: `2`
+
+### Executing very different commands per scene
+If you have very different commands for the different scenes you can use the following approach:
+* `Command`: `SCENE_VALUE`
+* `Scene1 value`: `do-something --arg=1`
+* `Scene2 value`: `something-entirely-different --cow=horse`
+
+## Guides
+### Loading PTZ presets using curl
 curl is a well-known cli-tool for executing any HTTP command. It is available for Linux, Windows and OSX.
 
 Most PTZ cameras come with a web-application. In this web-application you can configure the camera, and often also control the PTZ features of the camera, like setting and loading presets.
@@ -38,7 +56,7 @@ Most PTZ cameras come with a web-application. In this web-application you can co
 12. ...
 13. Profit!
 
-### Loading PTZ presets with onvif-ptz-cli
+### Loading PTZ presets of a camera with ONVIF support using onvif-ptz-cli
 Many PTZ cameras have support for the ONVIF protocol. Since this is an old SOAP protocol you can't easily execute these commands with curl.
 
 [onvif-ptz-cli](https://github.com/marklagendijk/node-onvif-ptz-cli) is a CLI tool that I created to be able to easily execute ONVIF commands from the command line. Together with the OBS Scene Execute Command you can easily execute ONVIF commands when an OBS scene is activated.
