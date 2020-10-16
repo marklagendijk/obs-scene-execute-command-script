@@ -19,9 +19,14 @@ OBS script for executing any CLI command whenever whenever a scene is activated.
 4. Enable the checkboxes for all the scenes for which you want to execute a command when they are activated.
 5. Enter the variable part for each scene.
 
-## Examples
+## Quick examples
 ### Loading PTZ presets of a Lumens camera using curl
 * `Command`: `curl http://192.168.178.61/cgi-bin/lums_configuration.cgi -H "Cookie: userName=admin; passWord=admin;" --data-raw "{\"cmd\":\"campresetrecall\",\"memnum\":\"SCENE_VALUE\"}"`
+* `Scene1 value`: `1`
+* `Scene2 value`: `2`
+
+### Loading PTZ presets of a Sony camera using curl with Digest Authentication
+* `Command`: `curl  http://192.168.1.160/command/presetposition.cgi?PresetCall=SCENE_VALUE --digest -u admin:password123`
 * `Scene1 value`: `1`
 * `Scene2 value`: `2`
 
