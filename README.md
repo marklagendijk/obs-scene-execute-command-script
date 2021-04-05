@@ -47,7 +47,7 @@ curl is a well-known cli-tool for executing any HTTP command. It is available fo
 
 Most PTZ cameras come with a web-application. In this web-application you can configure the camera, and often also control the PTZ features of the camera, like setting and loading presets.
 
-1. Open the web-application of the camera with Firefox or Chrome.
+1. Open the web-application of the camera with Firefox (using Chrome is not advised, because it will copy the command as a multi-line command, which doesn't work with the script).
 2. Open the Developer Tools of the browser (right-click -> Inspect element).
 3. Open the `Network` tab of the Developer Tools.
 4. Load a preset via the web-application. 
