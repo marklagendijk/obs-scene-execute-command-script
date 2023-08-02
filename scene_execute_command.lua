@@ -110,8 +110,8 @@ end
 
 function capture_output(command)
 	local tmp = io.popen(command, 'r')
-	local script_output = file:read('*all')
-	file:close()
+	local script_output = tmp:read('*all')
+	tmp:close()
 
 	return script_output
 end
