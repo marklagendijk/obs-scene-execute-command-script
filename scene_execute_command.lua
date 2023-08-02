@@ -51,6 +51,7 @@ end
 function script_properties()
 	local props = obs.obs_properties_create()
 
+	obs.obs_properties_add_bool(props, "capture_script_output", "Capture the script output in script log")
 	obs.obs_properties_add_text(props, "command", "Command", obs.OBS_TEXT_DEFAULT)
 	
 	local scenes = obs.obs_frontend_get_scenes()
@@ -88,12 +89,19 @@ function handle_scene_change()
 	local scene = obs.obs_frontend_get_current_scene()
 	local scene_name = obs.obs_source_get_name(scene)
 	local scene_enabled = obs.obs_data_get_bool(settings, "scene_enabled_" .. scene_name)
+	local capture_script_output = obs.obs_data_get_bool(settings, "capture_script_output")
+
 	if scene_enabled then
 		local command = obs.obs_data_get_string(settings, "command")
 		local scene_value = obs.obs_data_get_string(settings, "scene_value_" .. scene_name)
 		local scene_command = string.gsub(command, "SCENE_VALUE", scene_value)
 		obs.script_log(obs.LOG_INFO, "Activating " .. scene_name .. ". Executing command:\n  " .. scene_command)
-		os.execute(scene_command)
+
+		if capture_script_output then
+			local script_output = io.popen(scene_command, 'r')
+			obs.script_log(obs.LOG_INFO, "Script output: " .. script_output)
+		else
+			os.execute(scene_command)
 	else
 		obs.script_log(obs.LOG_INFO, "Activating " .. scene_name .. ". Command execution is disabled for this scene.")
 	end
