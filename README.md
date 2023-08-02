@@ -1,5 +1,5 @@
 # obs-scene-execute-command-script [![GitHub license](https://img.shields.io/github/license/marklagendijk/obs-scene-execute-command-script)](https://github.com/marklagendijk/obs-scene-execute-command-script/blob/master/LICENSE)
-OBS script for executing any CLI command whenever whenever a scene is activated. Useful for:
+OBS script for executing any CLI command whenever a scene is activated. Useful for:
 - Loading a preset of any PTZ camera when an OBS scene is activated.
 - Executing any command that does anything when an OBS scene is activated.
 
@@ -18,6 +18,7 @@ OBS script for executing any CLI command whenever whenever a scene is activated.
 3. Replace this variable part with `SCENE_VALUE` and enter the command in the `Command` setting.
 4. Enable the checkboxes for all the scenes for which you want to execute a command when they are activated.
 5. Enter the variable part for each scene.
+6. Optionally, you can log the output of the command (e.g. the response of an HTTP-request)
 
 ## Quick examples
 ### Loading PTZ presets of a Lumens camera using curl
