@@ -96,8 +96,8 @@ function handle_scene_change()
 		local scene_value = obs.obs_data_get_string(settings, "scene_value_" .. scene_name)
 		local scene_command = string.gsub(command, "SCENE_VALUE", scene_value)
 		obs.script_log(obs.LOG_INFO, "Activating " .. scene_name .. ". Executing command:\n  " .. scene_command)
-
-  local command_output = execute_command(scene_command)
+		
+		local command_output = execute_command(scene_command)
 		
 		if log_command_output then
 			obs.script_log(obs.LOG_INFO, "Command output: " .. command_output)
