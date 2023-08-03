@@ -97,11 +97,10 @@ function handle_scene_change()
 		local scene_command = string.gsub(command, "SCENE_VALUE", scene_value)
 		obs.script_log(obs.LOG_INFO, "Activating " .. scene_name .. ". Executing command:\n  " .. scene_command)
 
+  local command_output = capture_output(scene_command)
+		
 		if log_command_output then
-			local command_output = capture_output(scene_command)
 			obs.script_log(obs.LOG_INFO, "Command output: " .. command_output)
-		else
-			os.execute(scene_command)
 		end
 	else
 		obs.script_log(obs.LOG_INFO, "Activating " .. scene_name .. ". Command execution is disabled for this scene.")
@@ -109,7 +108,7 @@ function handle_scene_change()
 	obs.obs_source_release(scene);
 end
 
-function capture_output(command)
+function execute_output(command)
 	local handle = io.popen(command, 'r')
 	local command_output = handle:read('*all')
 	handle:close()
