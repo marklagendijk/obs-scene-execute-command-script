@@ -51,6 +51,7 @@ end
 function script_properties()
 	local props = obs.obs_properties_create()
 
+	obs.obs_properties_add_bool(props, "log_command_output", "Log the command output in script log")
 	obs.obs_properties_add_text(props, "command", "Command", obs.OBS_TEXT_DEFAULT)
 	
 	local scenes = obs.obs_frontend_get_scenes()
@@ -88,14 +89,29 @@ function handle_scene_change()
 	local scene = obs.obs_frontend_get_current_scene()
 	local scene_name = obs.obs_source_get_name(scene)
 	local scene_enabled = obs.obs_data_get_bool(settings, "scene_enabled_" .. scene_name)
+	local log_command_output = obs.obs_data_get_bool(settings, "log_command_output")
+
 	if scene_enabled then
 		local command = obs.obs_data_get_string(settings, "command")
 		local scene_value = obs.obs_data_get_string(settings, "scene_value_" .. scene_name)
 		local scene_command = string.gsub(command, "SCENE_VALUE", scene_value)
 		obs.script_log(obs.LOG_INFO, "Activating " .. scene_name .. ". Executing command:\n  " .. scene_command)
-		os.execute(scene_command)
+		
+		local command_output = execute_command(scene_command)
+		
+		if log_command_output then
+			obs.script_log(obs.LOG_INFO, "Command output: " .. command_output)
+		end
 	else
 		obs.script_log(obs.LOG_INFO, "Activating " .. scene_name .. ". Command execution is disabled for this scene.")
 	end
 	obs.obs_source_release(scene);
+end
+
+function execute_command(command)
+	local handle = io.popen(command, 'r')
+	local command_output = handle:read('*all')
+	handle:close()
+
+	return command_output
 end
